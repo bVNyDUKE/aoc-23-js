@@ -28,16 +28,18 @@ const maps = alm
   .split(",,")
   .reduce((sum, line) => {
     const lines = line.split(",");
-    const title = lines.shift().split(" ")[0];
+    const title = lines.shift().split(" ")[0].replaceAll("-", "_");
     if (title === "") return sum;
 
     sum[title] = lines.map((l) => l.split(" ").map((num) => parseInt(num)));
     return sum;
   }, {});
 
-function convertMapVal(val, key) {
-  for (const row of maps[key]) {
-    const [dest, src, rlen] = row;
+function convertMapVal(val, mapVal) {
+  for (const row of mapVal) {
+    const dest = row[0];
+    const src = row[1];
+    const rlen = row[2];
     if (src <= val && val < src + rlen) {
       const dif = dest - src;
       return val + dif;
@@ -46,13 +48,14 @@ function convertMapVal(val, key) {
   return val;
 }
 
-const keys = Object.keys(maps);
-
 const getLocationFromSeed = (seed) => {
-  let res = seed;
-  for (let i = 0; i < keys.length; i++) {
-    res = convertMapVal(res, keys[i]);
-  }
+  let res = convertMapVal(seed, maps.seed_to_soil);
+  res = convertMapVal(res, maps.soil_to_fertilizer);
+  res = convertMapVal(res, maps.fertilizer_to_water);
+  res = convertMapVal(res, maps.water_to_light);
+  res = convertMapVal(res, maps.light_to_temperature);
+  res = convertMapVal(res, maps.temperature_to_humidity);
+  res = convertMapVal(res, maps.humidity_to_location);
   return res;
 };
 
@@ -60,15 +63,16 @@ if (isMainThread) {
   const resArray = [];
 
   const onExit = () => {
-    if (resArray.length === seeds.length / 2) {
+    if (resArray.length === seeds.length) {
       console.log("HELLO RESULT:", Math.min(...resArray));
     }
   };
 
   for (let i = 0; i < seeds.length; i += 2) {
-    const seed = seeds[i];
-    const max = seed + seeds[i + 1];
-    makeWorker({ start: seed, max }, resArray, onExit);
+    const end = seeds[i + 1] + seeds[i];
+    const mid = Math.round((seeds[i] + end) / 2) - 1;
+    makeWorker({ start: seeds[i], max: mid }, resArray, onExit);
+    makeWorker({ start: mid + 1, max: end }, resArray, onExit);
   }
 } else {
   parentPort.once("message", ({ start, max }) => {
