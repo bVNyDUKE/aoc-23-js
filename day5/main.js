@@ -13,7 +13,7 @@ function makeWorker(workerData, resultArray, onExit) {
   return w;
 }
 
-const alm = fs.readFileSync("./test.txt").toString().split("\n");
+const alm = fs.readFileSync("./input.txt").toString().split("\n");
 
 const seeds = alm
   .shift()
@@ -60,7 +60,7 @@ if (isMainThread) {
   const resArray = [];
 
   const onExit = () => {
-    if (resArray.length === seeds.length) {
+    if (resArray.length === seeds.length / 2) {
       console.log("HELLO RESULT:", Math.min(...resArray));
     }
   };
@@ -73,6 +73,7 @@ if (isMainThread) {
 } else {
   parentPort.once("message", ({ start, max }) => {
     let min = -1;
+    console.log("processing", start, max);
     for (let s = start; s < max; s++) {
       let loc = getLocationFromSeed(s);
       if (min === -1 || loc < min) {
