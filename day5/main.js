@@ -37,12 +37,11 @@ const maps = alm
 
 function convertMapVal(val, mapVal) {
   for (let i = 0; i < mapVal.length; i++) {
-    const dest = mapVal[i][0];
-    const src = mapVal[i][1];
-    const rlen = mapVal[i][2];
-    if (src <= val && val < src + rlen) {
-      const dif = dest - src;
-      return val + dif;
+    // const dest = mapVal[i][0];
+    // const src = mapVal[i][1];
+    // const rlen = mapVal[i][2];
+    if (mapVal[i][1] <= val && val < mapVal[i][1] + mapVal[i][2]) {
+      return val + (mapVal[i][0] - mapVal[i][1]);
     }
   }
   return val;
