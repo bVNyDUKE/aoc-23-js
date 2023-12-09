@@ -36,10 +36,10 @@ const maps = alm
   }, {});
 
 function convertMapVal(val, mapVal) {
-  for (const row of mapVal) {
-    const dest = row[0];
-    const src = row[1];
-    const rlen = row[2];
+  for (let i = 0; i < mapVal.length; i++) {
+    const dest = mapVal[i][0];
+    const src = mapVal[i][1];
+    const rlen = mapVal[i][2];
     if (src <= val && val < src + rlen) {
       const dif = dest - src;
       return val + dif;
