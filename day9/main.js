@@ -12,7 +12,7 @@ function getDiff(line) {
   }
 
   const res = sum.reduceRight((t, _, i, arr) => {
-    return t + arr[i].pop();
+    return arr[i].shift() - t;
   }, 0);
 
   return res;
