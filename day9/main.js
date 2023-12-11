@@ -1,21 +1,17 @@
 const fs = require("fs");
 
-function getDiff(line) {
-  const sum = [line];
-  while (!sum[sum.length - 1].every((l) => l === 0)) {
-    const l = sum[sum.length - 1];
-    const res = [];
-    for (let i = 0; i < l.length - 1; i++) {
-      res.push((l[i + 1] || 0) - (l[i] || 0));
-    }
-    sum.push(res);
+function getDiff(l) {
+  const last = l[l.length - 1];
+  if (last.every((d) => d === 0)) {
+    return l.reduceRight((t, _, i, arr) => arr[i].shift() - t, 0);
   }
 
-  const res = sum.reduceRight((t, _, i, arr) => {
-    return arr[i].shift() - t;
-  }, 0);
-
-  return res;
+  const res = [];
+  for (let i = 0; i < last.length - 1; i++) {
+    res.push((last[i + 1] || 0) - (last[i] || 0));
+  }
+  l.push(res);
+  return getDiff(l);
 }
 
 const res = fs
@@ -27,7 +23,7 @@ const res = fs
     return line.split(" ").map((l) => parseInt(l));
   })
   .reduce((prev, curr) => {
-    return prev + getDiff(curr);
+    return prev + getDiff([curr]);
   }, 0);
 
 console.log(res);
